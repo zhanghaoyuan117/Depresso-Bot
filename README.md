@@ -1,0 +1,2 @@
+# Depresso-Bot
+Discord Bot
