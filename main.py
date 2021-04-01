@@ -10,6 +10,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         await ctx.send('Invalid command used.')
 
+#hello
 
 @client.command()
 async def load(ctx, extension):
