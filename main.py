@@ -5,11 +5,11 @@ from discord.ext import commands
 client = commands.Bot(command_prefix='+');
 BOT_KEY = os.environ.get('BOT_KEY')
 
+
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         await ctx.send('Invalid command used.')
-
 
 
 @client.command()

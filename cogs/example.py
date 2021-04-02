@@ -1,6 +1,8 @@
 import discord
+import os
 from discord.ext import commands, tasks
 from itertools import cycle
+from dotenv import load_dotenv
 
 
 class Example(commands.Cog):
