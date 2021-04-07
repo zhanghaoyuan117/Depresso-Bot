@@ -14,7 +14,6 @@ class Stock(commands.Cog):
 
     @commands.command(aliases=['news', 'stocknews'])
     async def stockNews(self, ctx, *, stockName):
-        load_dotenv("D:\Environment Variables\.env.txt")
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/89.0.4389.114 Safari/537.36 ',
@@ -66,6 +65,53 @@ class Stock(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['price'])
+    async def stockPrice(self, ctx, *, stockName):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/89.0.4389.114 Safari/537.36 ',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://google.com',
+            'Dnt': '1'
+        }
+
+        url = f'https://finance.yahoo.com/lookup?s={stockName}'
+        source = requests.get(url, headers).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        stockLink = soup.find('a', attrs={"data-reactid": "57"})['href']
+        url = f'https://finance.yahoo.com/{stockLink}'
+        source = requests.get(url).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        stockName = soup.find('h1', {"class": "D(ib) Fz(18px)"}).text
+        stockPrice = soup.find('div', {"class": "D(ib) Mend(20px)"}).find_all('span')[0].text
+        stockChange = soup.find('div', {"class": "D(ib) Mend(20px)"}).find_all('span')[1].text
+        stockDayRange = soup.find('td', attrs={"data-test": 'DAYS_RANGE-value'}).text
+        stockYearlyRange = soup.find('td', attrs={"data-test": 'FIFTY_TWO_WK_RANGE-value'}).text
+
+        if stockChange[0] == '+':
+            img = 'https://compote.slate.com/images/926e5009-c10a-48fe-b90e-fa0760f82fcd.png?width=1200&rect=680x453' \
+                  '&offset=0x30 '
+        elif stockChange[0] == '-':
+            img = 'https://i.kym-cdn.com/photos/images/newsfeed/001/857/750/4ab.png'
+        else:
+            img = 'https://i.kym-cdn.com/photos/images/original/001/459/556/023.png'
+
+        embed = discord.Embed(
+            title=stockName,
+            colour=discord.Colour.blue()
+        )
+
+        embed.add_field(name="Stock Price", value=stockPrice, inline=False)
+        embed.add_field(name="Stock Change", value=stockChange, inline=False)
+        embed.add_field(name="Stock's Daily Range", value=stockDayRange, inline=False)
+        embed.add_field(name="Stock's 52 week Range", value=stockYearlyRange, inline=False)
+
+        embed.set_thumbnail(url=img)
+
+        await ctx.send(embed=embed)
+
     @commands.command(aliases=['feat', 'Feat', 'Featured', 'featured'])
     async def stockFeatured(self, ctx, *, region):
         load_dotenv("D:\Environment Variables\.env.txt")
@@ -99,6 +145,7 @@ class Stock(commands.Cog):
     async def stock_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please type in a Region Symbol.')
+
 
 def setup(client):
     client.add_cog(Stock(client))
