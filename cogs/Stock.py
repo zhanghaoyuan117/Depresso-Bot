@@ -4,6 +4,7 @@ import requests
 import random
 from discord.ext import commands
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
 
 class Stock(commands.Cog):
@@ -11,44 +12,57 @@ class Stock(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases=['news'])
-    async def stockNews(self, ctx, *, symbol):
+    @commands.command(aliases=['news', 'stocknews'])
+    async def stockNews(self, ctx, *, stockName):
         load_dotenv("D:\Environment Variables\.env.txt")
-        url = "https://yahoo-finance-low-latency.p.rapidapi.com/v2/finance/news"
-        querystring = {"symbols": symbol}
-
         headers = {
-            'x-rapidapi-key': os.getenv('RAPID_API_KEY'),
-            'x-rapidapi-host': "yahoo-finance-low-latency.p.rapidapi.com"
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/89.0.4389.114 Safari/537.36 ',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://google.com',
+            'Dnt': '1'
         }
 
-        response = requests.request("GET", url, headers=headers, params=querystring).json()
-        articleNum = random.randint(0, len(response['Content']['result']))
-        article = response['Content']['result'][articleNum]
-        print(response['Content']['result'][articleNum])
+        url = f'https://finance.yahoo.com/lookup?s={stockName}'
+        source = requests.get(url, headers).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        stockLink = soup.find('a', attrs={"data-reactid": "57"})['href']
+        url = f'https://finance.yahoo.com/{stockLink}'
+        source = requests.get(url).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        articles = soup.find('ul', {"class": 'My(0) Ov(h) P(0) Wow(bw)'}).find_all('li')
+
+        article = random.choice(articles)
+        title = article.find('a').text
+
+        print(title)
+        href = article.find('a')['href']
+        articleLink = f'https://finance.yahoo.com/{href}'
+        try:
+            providerInfo = article.find('div', {"class": "C(#959595) Fz(11px) D(ib) Mb(6px)"}).text
+        except AttributeError as e:
+            providerInfo = 'None'
+        try:
+            img = article.find('img')['src']
+        except TypeError as e:
+            img = 'https://picsum.photos/id/1031/200'
+        try:
+            summary = article.find('p').text
+        except AttributeError as e:
+            summary = 'No Summary'
 
         embed = discord.Embed(
-            title=article['title'],
-            summary=article['summary'],
+            title=title,
             colour=discord.Colour.blue()
         )
 
-        if "thumbnail" in article:
-            embed.set_author(name=article['author_name'], icon_url=article['thumbnail'])
-            embed.set_thumbnail(url=article['thumbnail'])
-            embed.set_image(url=article['thumbnail'])
-        else:
-            embed.set_author(name=article['author_name'], icon_url="https://picsum.photos/id/1031/200")
-            embed.set_thumbnail(url="https://picsum.photos/id/1031/200")
-            embed.set_image(url="https://picsum.photos/id/1031/200")
-
-        embed.add_field(
-            name="Time Zone",
-            value=article['timeZoneShortName'] + ", " + article['timeZoneFullName'],
-            inline=False
-        )
-        embed.add_field(name="Provider", value=article['provider_name'], inline=False)
-        embed.add_field(name="URL", value=article['url'], inline=False)
+        embed.add_field(name="Description", value=summary, inline=False)
+        embed.set_thumbnail(url=img)
+        embed.set_image(url=img)
+        embed.add_field(name="Provider", value=providerInfo, inline=False)
+        embed.add_field(name="URL", value=articleLink, inline=False)
 
         await ctx.send(embed=embed)
 
@@ -79,7 +93,7 @@ class Stock(commands.Cog):
     @stockNews.error
     async def stock_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please type in a Symbol.')
+            await ctx.send('Please type in a Symbol/Company name.')
 
     @stockFeatured.error
     async def stock_error(self, ctx, error):
