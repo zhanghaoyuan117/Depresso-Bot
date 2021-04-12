@@ -131,15 +131,15 @@ class Stock(commands.Cog):
         )
 
         for x in result:
-            print(x['symbol'])
             embed.add_field(name=x['symbol'], value=x['symbol'])
 
         await ctx.send(embed=embed)
 
     @stockNews.error
+    @stockPrice.error
     async def stock_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please type in a Symbol/Company name.')
+            await ctx.send('Please type in a Symbol or Company name.')
 
     @stockFeatured.error
     async def stock_error(self, ctx, error):
