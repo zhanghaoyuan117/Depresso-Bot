@@ -36,7 +36,6 @@ class Stock(commands.Cog):
         article = random.choice(articles)
         title = article.find('a').text
 
-        print(title)
         href = article.find('a')['href']
         articleLink = f'https://finance.yahoo.com/{href}'
         try:

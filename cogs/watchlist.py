@@ -1,5 +1,4 @@
 import discord
-import os
 import requests
 import sqlite3
 from discord.ext import commands
