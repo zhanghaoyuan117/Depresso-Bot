@@ -5,6 +5,7 @@ import random
 from discord.ext import commands
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
+from datetime import date
 
 
 class Stock(commands.Cog):
@@ -132,6 +133,86 @@ class Stock(commands.Cog):
         for x in result:
             embed.add_field(name=x['symbol'], value=x['symbol'])
 
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def topGain(self, ctx):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/89.0.4389.114 Safari/537.36 ',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://google.com',
+            'Dnt': '1'
+        }
+
+        url = f'https://finance.yahoo.com/gainers'
+        source = requests.get(url, headers).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        table = soup.find('table', {"class": "W(100%)"})
+
+        body = table.find('tbody')
+
+        rows = body.findAll('tr')
+
+        embed = discord.Embed(
+            title=f'Top Gains for {date.today()}',
+            colour=discord.Colour.blue()
+        )
+
+        for row in rows:
+            elements = row.findAll('td')
+            element = []
+
+            for x in elements:
+                element.append(x.text)
+
+            company = element[1]
+            price = element[2]
+            change = element[3]
+            changePct = element[4]
+            desc = f"Price: {price}$, Change: {change}/{changePct}"
+            embed.add_field(name=company, value=desc)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def topLoss(self, ctx):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/89.0.4389.114 Safari/537.36 ',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://google.com',
+            'Dnt': '1'
+        }
+
+        url = f'https://finance.yahoo.com/losers'
+        source = requests.get(url, headers).text
+        soup = BeautifulSoup(source, 'lxml')
+
+        table = soup.find('table', {"class": "W(100%)"})
+
+        body = table.find('tbody')
+
+        rows = body.findAll('tr')
+
+        embed = discord.Embed(
+            title=f'Top Loss for {date.today()}',
+            colour=discord.Colour.blue()
+        )
+
+        for row in rows:
+            elements = row.findAll('td')
+            element = []
+
+            for x in elements:
+                element.append(x.text)
+
+            company = element[1]
+            price = element[2]
+            change = element[3]
+            changePct = element[4]
+            desc = f"Price: {price}$, Change: {change}/{changePct}"
+            embed.add_field(name=company, value=desc)
         await ctx.send(embed=embed)
 
     @stockNews.error
