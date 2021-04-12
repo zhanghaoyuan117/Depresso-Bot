@@ -3,6 +3,7 @@ import requests
 import sqlite3
 from discord.ext import commands
 from bs4 import BeautifulSoup
+import concurrent.futures
 
 
 class Watchlist(commands.Cog):
@@ -82,12 +83,18 @@ class Watchlist(commands.Cog):
             colour=discord.Colour.blue()
         )
 
-        for stock in stocks:
+        def thread(stock):
             url = f'https://finance.yahoo.com/lookup?s={stock[1]}'
             source = requests.get(url, headers).text
             soup = BeautifulSoup(source, 'lxml')
             stockPrice = soup.find('td', {"class": "data-col2 Ta(end) Pstart(20px) Pend(15px)"}).text
             embed.add_field(name=stock[1], value=stockPrice)
+
+        no_threads = 5
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=no_threads) as executor:
+            for stock in stocks:
+                executor.submit(thread, stock)
 
         conn.close()
 
