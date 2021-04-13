@@ -135,8 +135,8 @@ class Stock(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def topGain(self, ctx):
+    @commands.command(aliases=['topgain'])
+    async def topGain(self, ctx, *, region):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/89.0.4389.114 Safari/537.36 ',
@@ -145,7 +145,13 @@ class Stock(commands.Cog):
             'Dnt': '1'
         }
 
-        url = f'https://finance.yahoo.com/gainers'
+        if region in ['US','Us', 'us']:
+            url = f'https://finance.yahoo.com/gainers'
+            region = 'United States'
+        else:
+            url = f'https://ca.finance.yahoo.com/gainers'
+            region = 'Canada'
+
         source = requests.get(url, headers).text
         soup = BeautifulSoup(source, 'lxml')
 
@@ -156,7 +162,7 @@ class Stock(commands.Cog):
         rows = body.findAll('tr')
 
         embed = discord.Embed(
-            title=f'Top Gains for {date.today()}',
+            title=f'Top Gains for {region} ({date.today()})',
             colour=discord.Colour.blue()
         )
 
@@ -167,16 +173,20 @@ class Stock(commands.Cog):
             for x in elements:
                 element.append(x.text)
 
+            ticker = element[0]
             company = element[1]
             price = element[2]
             change = element[3]
             changePct = element[4]
             desc = f"Price: {price}$, Change: {change}/{changePct}"
-            embed.add_field(name=company, value=desc)
+            if company in '':
+                embed.add_field(name=ticker, value=desc)
+            else:
+                embed.add_field(name=company, value=desc)
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def topLoss(self, ctx):
+    @commands.command(aliases=['toploss'])
+    async def topLoss(self, ctx, *, region):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/89.0.4389.114 Safari/537.36 ',
@@ -185,7 +195,13 @@ class Stock(commands.Cog):
             'Dnt': '1'
         }
 
-        url = f'https://finance.yahoo.com/losers'
+        if region in ['US','Us', 'us']:
+            url = f'https://finance.yahoo.com/losers'
+            region = 'United States'
+        else:
+            url = f'https://ca.finance.yahoo.com/losers'
+            region = 'Canada'
+
         source = requests.get(url, headers).text
         soup = BeautifulSoup(source, 'lxml')
 
@@ -196,7 +212,7 @@ class Stock(commands.Cog):
         rows = body.findAll('tr')
 
         embed = discord.Embed(
-            title=f'Top Loss for {date.today()}',
+            title=f'Top Loss for {region} ({date.today()})',
             colour=discord.Colour.blue()
         )
 
@@ -207,14 +223,21 @@ class Stock(commands.Cog):
             for x in elements:
                 element.append(x.text)
 
+            ticker = element[0]
             company = element[1]
             price = element[2]
             change = element[3]
             changePct = element[4]
             desc = f"Price: {price}$, Change: {change}/{changePct}"
-            embed.add_field(name=company, value=desc)
+            if company in '':
+                embed.add_field(name=ticker, value=desc)
+            else:
+                embed.add_field(name=company, value=desc)
+
         await ctx.send(embed=embed)
 
+    @topGain.error
+    @topLoss.error
     @stockNews.error
     @stockPrice.error
     async def stock_error(self, ctx, error):
