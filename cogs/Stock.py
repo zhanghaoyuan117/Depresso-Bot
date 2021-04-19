@@ -244,10 +244,10 @@ class Stock(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please type in a Symbol or Company name.')
 
-    @stockFeatured.error
-    async def stock_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please type in a Region Symbol.')
+    # @stockFeatured.error
+    # async def stock_error(self, ctx, error):
+    #     if isinstance(error, commands.MissingRequiredArgument):
+    #         await ctx.send('Please type in a Region Symbol.')
 
 
 def setup(client):
