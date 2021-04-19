@@ -13,20 +13,20 @@ class Watchlist(commands.Cog):
 
     # CREATING DATABASE (ONLY USE ONCE)-------------------------------------------------
 
-    # @commands.command()
-    # async def createDB(self, ctx):
-    #     conn = sqlite3.connect('./database/stock.db')
-    #     c = conn.cursor()
-    #
-    #     c.execute("""CREATE TABLE stock (
-    #                 id integer,
-    #                 name text,
-    #                 ticker text,
-    #                 UNIQUE(id, ticker)
-    #                 )""")
-    #     conn.close()
-    #
-    #     await ctx.send('Success!')
+    @commands.command()
+    async def createDB(self, ctx):
+        conn = sqlite3.connect('./database/stock.db')
+        c = conn.cursor()
+
+        c.execute("""CREATE TABLE stock (
+                    id integer,
+                    name text,
+                    ticker text,
+                    UNIQUE(id, ticker)
+                    )""")
+        conn.close()
+
+        await ctx.send('Success!')
 
     # -----------------------------------------------------------------------------------
 
