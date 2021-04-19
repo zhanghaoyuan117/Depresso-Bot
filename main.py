@@ -3,7 +3,7 @@ import os
 from discord.ext import commands
 
 client = commands.Bot(command_prefix='+');
-BOT_KEY = os.environ.get('BOT_KEY')
+BOT_KEY = os.environ['BOT_KEY']
 
 
 @client.event
