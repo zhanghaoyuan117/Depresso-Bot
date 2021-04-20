@@ -235,11 +235,13 @@ class Stock(commands.Cog):
             price = element[2]
             change = element[3]
             changePct = element[4]
-            desc = f"Price: {price}$, Change: {change}/{changePct} \n {companyLink}"
+
             if company in '':
-                embed.add_field(name=ticker, value=desc)
+                desc = f"Company: {ticker}, \n Price: {price}$, \n Change: {change}/{changePct}"
             else:
-                embed.add_field(name=company, value=desc)
+                desc = f"Company: {company}, \n Price: {price}$, \n Change: {change}/{changePct}"
+
+            embed.add_field(name=companyLink, value=desc)
 
         await ctx.send(embed=embed)
 
