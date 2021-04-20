@@ -6,10 +6,10 @@ client = commands.Bot(command_prefix='+');
 BOT_KEY = os.environ['BOT_KEY']
 
 
-# @client.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CommandNotFound):
-#         await ctx.send('Invalid command used.')
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send('Invalid command used.')
 
 
 @client.command()
