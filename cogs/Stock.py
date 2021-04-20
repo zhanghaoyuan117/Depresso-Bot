@@ -137,7 +137,6 @@ class Stock(commands.Cog):
 
     @commands.command(aliases=['topgain'])
     async def topGain(self, ctx, *, region):
-        print(3)
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -146,8 +145,6 @@ class Stock(commands.Cog):
             'Referer': 'https://google.com',
             'Dnt': '1'
         }
-
-        print(2)
 
         if region in ['US','Us', 'us']:
             url = f'https://finance.yahoo.com/gainers'
@@ -164,8 +161,6 @@ class Stock(commands.Cog):
         body = table.find('tbody')
 
         rows = body.findAll('tr')
-
-        print(1)
 
         embed = discord.Embed(
             title=f'Top Gains for {region} ({date.today()})',
