@@ -174,12 +174,15 @@ class Stock(commands.Cog):
             for x in elements:
                 element.append(x.text)
 
+            href = row.find('a')['href']
+            companyLink = f'https://finance.yahoo.com/{href}'
+
             ticker = element[0]
             company = element[1]
             price = element[2]
             change = element[3]
             changePct = element[4]
-            desc = f"Price: {price}$, Change: {change}/{changePct}"
+            desc = f"Price: {price}$, Change: {change}/{changePct} \n {companyLink}"
             if company in '':
                 embed.add_field(name=ticker, value=desc)
             else:
@@ -224,12 +227,15 @@ class Stock(commands.Cog):
             for x in elements:
                 element.append(x.text)
 
+            href = row.find('a')['href']
+            companyLink = f'https://finance.yahoo.com/{href}'
+
             ticker = element[0]
             company = element[1]
             price = element[2]
             change = element[3]
             changePct = element[4]
-            desc = f"Price: {price}$, Change: {change}/{changePct}"
+            desc = f"Price: {price}$, Change: {change}/{changePct} \n {companyLink}"
             if company in '':
                 embed.add_field(name=ticker, value=desc)
             else:
